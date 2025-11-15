@@ -15,6 +15,7 @@ import androidx.core.view.WindowInsetsCompat
 class MainActivity : AppCompatActivity() {
 
 
+
     lateinit var item: EditText
     lateinit var add: Button
     lateinit var listView: ListView
