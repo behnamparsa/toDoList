@@ -1,7 +1,7 @@
 name: Android Instrumentation Tests (ReactiveCircus)
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # set for manual run only
 #  push:
 #    branches: [ master ]
 #    paths:
