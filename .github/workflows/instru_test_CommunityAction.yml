@@ -1,0 +1,36 @@
+name: Android Instrumentation Tests (ReactiveCircus)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+    paths:
+      - 'app/src/androidTest/**'
+      - '.github/workflows/instru_test_CommunityAction.yml'
+
+jobs:
+  instrumentation-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Run emulator and tests (ReactiveCircus)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel
+          script: ./gradlew connectedAndroidTest

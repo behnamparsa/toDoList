@@ -1,0 +1,40 @@
+name: Android Instrumentation Tests (DIY)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+    paths:
+      - 'app/src/androidTest/**'
+      - '.github/workflows/instru_test_Custom(DIY).yml'
+
+jobs:
+  instrumentation-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Create AVD
+        run: |
+          sdkmanager "system-images;android-30;google_apis;x86_64"
+          echo "no" | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" -d pixel
+
+      - name: Start emulator
+        run: |
+          nohup emulator -avd test -no-snapshot -no-window -gpu swiftshader_indirect -no-audio &
+          adb wait-for-device
+          adb shell input keyevent 82
+
+      - name: Run instrumentation tests
+        run: ./gradlew connectedAndroidTest
