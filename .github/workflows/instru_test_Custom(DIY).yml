@@ -3,7 +3,7 @@ name: Android Instrumentation Tests (DIY)
 on:
   workflow_dispatch:
   push:
-    branches: [ master ]
+    branches: [ master ]  # make sure you really use 'master'; use 'main' if that's your default branch
     paths:
       - 'app/src/androidTest/**'
       - '.github/workflows/instru_test_Custom(DIY).yml'
@@ -11,6 +11,7 @@ on:
 jobs:
   instrumentation-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: Checkout
@@ -25,15 +26,45 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Install emulator and system image
+        run: |
+          sdkmanager --install "platform-tools" "emulator" "system-images;android-30;google_apis;x86_64"
+          sdkmanager --licenses <<< "y"
+
       - name: Create AVD
         run: |
-          sdkmanager "system-images;android-30;google_apis;x86_64"
           echo "no" | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" -d pixel
 
       - name: Start emulator
         run: |
-          nohup emulator -avd test -no-snapshot -no-window -gpu swiftshader_indirect -no-audio &
+          EMULATOR="$ANDROID_SDK_ROOT/emulator/emulator"
+          echo "Using emulator binary at: $EMULATOR"
+          if [ ! -x "$EMULATOR" ]; then
+            echo "Emulator binary not found or not executable"
+            ls -R "$ANDROID_SDK_ROOT"
+            exit 1
+          fi
+
+          nohup "$EMULATOR" -avd test -no-snapshot -no-window -gpu swiftshader_indirect -no-audio -no-boot-anim &
           adb wait-for-device
+
+          # Wait for boot completion with timeout (max ~10 minutes)
+          booted=""
+          attempts=0
+          while [ -z "$booted" ] && [ $attempts -lt 60 ]; do
+            booted=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+            echo "Waiting for emulator to boot... attempt $attempts, sys.boot_completed=$booted"
+            attempts=$((attempts + 1))
+            sleep 10
+          done
+
+          if [ "$booted" != "1" ]; then
+            echo "Emulator failed to boot in time"
+            adb emu kill || true
+            exit 1
+          fi
+
+          echo "Emulator booted successfully"
           adb shell input keyevent 82
 
       - name: Run instrumentation tests
