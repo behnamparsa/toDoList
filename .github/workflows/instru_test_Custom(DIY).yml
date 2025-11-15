@@ -51,7 +51,17 @@ jobs:
           echo "Listing AVDs just before start:"
           "$EMULATOR" -list-avds
 
-          nohup "$EMULATOR" -avd test -no-snapshot -no-window -gpu swiftshader_indirect -no-audio -no-boot-anim &
+          # Start emulator in SOFTWARE mode (no hardware acceleration / KVM)
+          nohup "$EMULATOR" \
+            -avd test \
+            -no-snapshot \
+            -no-window \
+            -gpu swiftshader_indirect \
+            -no-audio \
+            -no-boot-anim \
+            -accel off \
+            > emulator.log 2>&1 &
+
           adb wait-for-device
 
           # Wait for boot completion with timeout (~10 min max)
@@ -65,13 +75,15 @@ jobs:
           done
 
           if [ "$booted" != "1" ]; then
-            echo "Emulator failed to boot in time"
+            echo "Emulator failed to boot in time. Emulator log:"
+            cat emulator.log || true
             adb emu kill || true
             exit 1
           fi
 
           echo "Emulator booted successfully"
           adb shell input keyevent 82
+      
 
       - name: Run instrumentation tests
         run: ./gradlew connectedAndroidTest
