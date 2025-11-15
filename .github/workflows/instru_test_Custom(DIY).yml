@@ -51,7 +51,7 @@ jobs:
           echo "Listing AVDs just before start:"
           "$EMULATOR" -list-avds
 
-          # Start emulator in SOFTWARE mode (no hardware acceleration / KVM)
+          # Start emulator in SOFTWARE mode (no hardware acceleration / KVM) v2.0
           nohup "$EMULATOR" \
             -avd test \
             -no-snapshot \
