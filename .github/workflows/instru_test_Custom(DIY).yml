@@ -39,7 +39,7 @@ jobs:
       - name: Create AVD
         run: |
           mkdir -p "$ANDROID_AVD_HOME"
-          echo "no" | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" -d pixel
+          echo "no" | avdmanager create avd -n test -k "system-images;android-31;google_apis;x86_64" -d pixel
           echo "Available AVDs after creation:"
           "$ANDROID_SDK_ROOT/emulator/emulator" -list-avds
 
