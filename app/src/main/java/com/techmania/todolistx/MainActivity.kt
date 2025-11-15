@@ -14,16 +14,12 @@ import androidx.core.view.WindowInsetsCompat
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var item: EditText
-    lateinit var add: Button
-    lateinit var listView: ListView
+    private lateinit var item: EditText
+    private lateinit var add: Button
+    private lateinit var listView: ListView
 
-    var itemList = ArrayList<String>()
-
-    var fileHelper = FileHelper()
-
-
-
+    private var itemList = ArrayList<String>()
+    private var fileHelper = FileHelper()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,38 +35,52 @@ class MainActivity : AppCompatActivity() {
         add = findViewById(R.id.button)
         listView = findViewById(R.id.list)
 
+        // Load saved items (simple strings)
         itemList = fileHelper.readData(this)
-        var arrayAdapter = ArrayAdapter(this,android.R.layout.simple_list_item_1,android.R.id.text1,itemList)
+
+        // Simple string adapter
+        val arrayAdapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_list_item_1,
+            android.R.id.text1,
+            itemList
+        )
+
         listView.adapter = arrayAdapter
+
+        // Add button: add text as a simple item
         add.setOnClickListener {
+            val itemName = item.text.toString().trim()
 
-            var itemName: String = item.text.toString()
+            if (itemName.isEmpty()) {
+                item.error = "Please enter an item"
+                return@setOnClickListener
+            }
+
             itemList.add(itemName)
-            item.setText("")
-            fileHelper.writeData(itemList,application)
+            fileHelper.writeData(itemList, applicationContext)
             arrayAdapter.notifyDataSetChanged()
-
-
-
+            item.setText("")
         }
 
-        listView.setOnItemClickListener{adapterView,view, position, l ->
-            var alert = AlertDialog.Builder(this)
+        // Tap item -> confirm delete
+        listView.setOnItemClickListener { _, _, position, _ ->
+            val alert = AlertDialog.Builder(this)
             alert.setTitle("Delete")
             alert.setMessage("Do you want to delete this item from list?")
             alert.setCancelable(false)
-            alert.setNegativeButton("No", DialogInterface.OnClickListener{dialogInterface,i ->
+
+            alert.setNegativeButton("No") { dialogInterface: DialogInterface, _ ->
                 dialogInterface.cancel()
-            })
-            alert.setPositiveButton("Yes", DialogInterface.OnClickListener{dialogInterface, i ->
+            }
+
+            alert.setPositiveButton("Yes") { _, _ ->
                 itemList.removeAt(position)
                 arrayAdapter.notifyDataSetChanged()
-                fileHelper.writeData(itemList,applicationContext)
+                fileHelper.writeData(itemList, applicationContext)
+            }
 
-            })
             alert.create().show()
-
         }
-
     }
 }
