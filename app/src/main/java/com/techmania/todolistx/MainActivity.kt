@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     var itemList = ArrayList<String>()
 
     var fileHelper = FileHelper()
-    //Sample note is added just to see the effect
+
 
 
 
