@@ -83,7 +83,14 @@ jobs:
 
           echo "Emulator booted successfully"
           adb shell input keyevent 82
-      
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Run instrumentation tests
+        run: ./gradlew connectedAndroidTest
+
+
 
       - name: Run instrumentation tests
         run: ./gradlew connectedAndroidTest
