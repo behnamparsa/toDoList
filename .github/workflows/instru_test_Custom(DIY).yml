@@ -3,7 +3,7 @@ name: Android Instrumentation Tests (DIY)
 on:
   workflow_dispatch:
   push:
-    branches: [ master ]  # make sure you really use 'master'; use 'main' if that's your default branch
+    branches: [ master ]
     paths:
       - 'app/src/androidTest/**'
       - '.github/workflows/instru_test_Custom(DIY).yml'
@@ -12,6 +12,11 @@ jobs:
   instrumentation-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+      ANDROID_AVD_HOME: /home/runner/.android/avd
 
     steps:
       - name: Checkout
@@ -33,22 +38,23 @@ jobs:
 
       - name: Create AVD
         run: |
+          mkdir -p "$ANDROID_AVD_HOME"
           echo "no" | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" -d pixel
+          echo "Available AVDs after creation:"
+          "$ANDROID_SDK_ROOT/emulator/emulator" -list-avds
 
       - name: Start emulator
         run: |
           EMULATOR="$ANDROID_SDK_ROOT/emulator/emulator"
           echo "Using emulator binary at: $EMULATOR"
-          if [ ! -x "$EMULATOR" ]; then
-            echo "Emulator binary not found or not executable"
-            ls -R "$ANDROID_SDK_ROOT"
-            exit 1
-          fi
+
+          echo "Listing AVDs just before start:"
+          "$EMULATOR" -list-avds
 
           nohup "$EMULATOR" -avd test -no-snapshot -no-window -gpu swiftshader_indirect -no-audio -no-boot-anim &
           adb wait-for-device
 
-          # Wait for boot completion with timeout (max ~10 minutes)
+          # Wait for boot completion with timeout (~10 min max)
           booted=""
           attempts=0
           while [ -z "$booted" ] && [ $attempts -lt 60 ]; do
