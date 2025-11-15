@@ -33,7 +33,7 @@ jobs:
 
       - name: Install emulator and system image
         run: |
-          sdkmanager --install "platform-tools" "emulator" "system-images;android-30;google_apis;x86_64"
+          sdkmanager --install "platform-tools" "emulator" "system-images;android-31;google_apis;x86_64"
           sdkmanager --licenses <<< "y"
 
       - name: Create AVD
