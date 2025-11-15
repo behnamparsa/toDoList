@@ -1,7 +1,6 @@
 name: Run test
 
 on:
-
   push:
     branches: [master]
   pull_request:
@@ -19,11 +18,33 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17
-
           cache: 'gradle'
 
-      - name: Grant_execute_permissions_for_gradlew
+      - name: Grant execute permissions for gradlew
         run: chmod +x gradlew
 
       - name: Run unit tests
-        run: ./gradlew clean testDebug
+        run: ./gradlew testDebug
+
+      - name: Summarize test results
+        if: always()
+        uses: jeantessier/test-summary-action@v1
+
+      - name: Upload unit test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-report
+          path: |
+            app/build/reports/tests/testDebugUnitTest/
+            app/build/test-results/testDebugUnitTest/
+
+      - name: Run Android Lint
+        run: ./gradlew lintDebug
+
+      - name: Upload lint report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-report
+          path: app/build/reports/lint-results-debug.html
