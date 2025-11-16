@@ -41,16 +41,14 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
-          # These are similar to the public workflow; can be simplified later on
-          #cmdline-tools-version: '13114758'
           packages: |
             cmdline-tools;latest
             platform-tools
             platforms;android-32
             build-tools;34.0.0
             
-            
-            # Optional but useful: enable KVM and free disk space for emulator
+
+      # Optional but useful: enable KVM and free disk space for emulator
       - name: Enable KVM for emulator and clear up space
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
