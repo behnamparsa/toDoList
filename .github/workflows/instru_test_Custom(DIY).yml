@@ -2,7 +2,7 @@ name: Android Instrumentation Tests (DIY)
 
 on:
   workflow_dispatch:
-  push:
+#  push:
 #    branches: [ master ]
 #    paths:
 #      - 'app/src/androidTest/**'
