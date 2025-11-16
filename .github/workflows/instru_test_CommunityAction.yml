@@ -17,6 +17,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -33,4 +36,22 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: pixel
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot
           script: ./gradlew connectedAndroidTest
+
+      # Optional but very useful: upload XML & HTML reports
+      - name: Upload AndroidTest XML results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: androidTest-xml-results
+          path: app/build/outputs/androidTest-results/connected/**
+          if-no-files-found: ignore
+
+      - name: Upload AndroidTest HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: androidTest-html-report
+          path: app/build/reports/androidTests/connected/**
+          if-no-files-found: ignore
