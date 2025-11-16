@@ -88,7 +88,10 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run instrumentation tests
-        run: ./gradlew connectedAndroidTest
+        #run: ./gradlew connectedAndroidTest
+        # add a retry once on emulator crash
+        run: |
+          ./gradlew connectedAndroidTest || ./gradlew connectedAndroidTest 
 
 
 
@@ -96,6 +99,7 @@ jobs:
         run: ./gradlew connectedAndroidTest
 
       - name: Upload AndroidTest HTML report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: androidTest-html-report
