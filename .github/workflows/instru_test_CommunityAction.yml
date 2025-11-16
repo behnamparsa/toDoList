@@ -42,7 +42,7 @@ jobs:
         uses: android-actions/setup-android@v3
         with:
           # These are similar to the public workflow; can be simplified later on
-          cmdline-tools-version: '13114758'
+          #cmdline-tools-version: '13114758'
           packages: |
             cmdline-tools;latest
             platform-tools
