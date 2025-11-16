@@ -32,10 +32,10 @@ jobs:
       - name: Run emulator and tests (ReactiveCircus)
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 31
+          api-level: 32
           target: google_apis
           arch: x86_64
-          profile: pixel
+          profile: pixel_3a
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot
           emulator-boot-timeout: 1200
           script: ./gradlew connectedAndroidTest
