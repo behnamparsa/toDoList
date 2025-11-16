@@ -2,11 +2,11 @@ name: Android Instrumentation Tests (ReactiveCircus)
 
 on:
   workflow_dispatch: # set for manual run only
-  push:
-    branches: [ master ]
-    paths:
-      - 'app/src/androidTest/**'
-      - '.github/workflows/instru_test_CommunityAction.yml'
+#  push:
+#    branches: [ master ]
+#    paths:
+#      - 'app/src/androidTest/**'
+#      - '.github/workflows/instru_test_CommunityAction.yml'
 
 jobs:
   instrumentation-tests:
@@ -32,7 +32,7 @@ jobs:
       - name: Run emulator and tests (ReactiveCircus)
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 33
+          api-level: 32
           target: google_apis
           arch: x86_64
           profile: pixel_3a

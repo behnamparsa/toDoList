@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.ManagedVirtualDevice
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -36,8 +38,19 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
-}
 
+    testOptions {
+        managedDevices {
+            allDevices {
+                create<ManagedVirtualDevice>("pixel2Api32") {
+                    device = "Pixel 2"
+                    apiLevel = 32              // ≥ 31 is fine for your minSdk 31
+                    systemImageSource = "google-atd"
+                }
+            }
+        }
+    }
+}
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

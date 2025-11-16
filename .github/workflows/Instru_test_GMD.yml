@@ -1,0 +1,55 @@
+name: Android Instrumentation Tests (GMD)
+
+on:
+  workflow_dispatch: # manual trigger for now
+  push:
+    branches: [ master ]
+    paths:
+      - 'app/src/androidTest/**'
+      - '.github/workflows/instru_test_GMD.yml'
+
+jobs:
+  instrumentation-tests-gmd:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses > /dev/null || true
+
+      - name: Install GMD system image
+        run: sdkmanager "system-images;android-32;google_atd;x86_64" || true
+
+      - name: Run GMD instrumentation tests
+        run: ./gradlew pixel2Api32DebugAndroidTest
+
+      - name: Upload AndroidTest XML results (GMD)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gmd-androidTest-xml-results
+          path: app/build/outputs/androidTest-results/**
+          if-no-files-found: ignore
+
+      - name: Upload AndroidTest HTML report (GMD)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gmd-androidTest-html-report
+          path: app/build/reports/androidTests/**
+          if-no-files-found: ignore
