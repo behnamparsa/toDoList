@@ -2,16 +2,16 @@ name: Android Instrumentation Tests (ReactiveCircus)
 
 on:
   workflow_dispatch: # set for manual run only
-#  push:
-#    branches: [ master ]
-#    paths:
-#      - 'app/src/main/**'
-#      - 'app/src/androidTest/**'
-#      - '.github/workflows/instru_test_CommunityAction.yml'
+  push:
+    branches: [ master ]
+    paths:
+      - 'app/src/main/**'
+      - 'app/src/androidTest/**'
+      - '.github/workflows/instru_test_CommunityAction.yml'
 
 jobs:
   instrumentation-tests:
-    runs-on: macos-latest
+    runs-on: macos-12
     timeout-minutes: 31
 
     steps:
@@ -39,7 +39,7 @@ jobs:
           profile: pixel_3a
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot
           emulator-boot-timeout: 1200
-          script: ./gradlew connectedAndroidTest
+          script: ./gradlew connectedDebugAndroidTest
 
       # Optional but very useful: upload XML & HTML reports
       - name: Upload AndroidTest XML results

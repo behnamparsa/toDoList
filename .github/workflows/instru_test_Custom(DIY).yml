@@ -2,12 +2,12 @@ name: Android Instrumentation Tests (DIY)
 
 on:
   workflow_dispatch:
-#  push:
-#    branches: [ master ]
-#    paths:
-#     - 'app/src/main/**'
-#      - 'app/src/androidTest/**'
-#      - '.github/workflows/instru_test_Custom(DIY).yml'
+  push:
+    branches: [ master ]
+    paths:
+      - 'app/src/main/**'
+      - 'app/src/androidTest/**'
+      - '.github/workflows/instru_test_Custom(DIY).yml'
 
 jobs:
   instrumentation-tests:
