@@ -40,12 +40,16 @@ android {
     }
 
     testOptions {
+        animationsDisabled = true
+
         managedDevices {
             allDevices {
                 create<ManagedVirtualDevice>("pixel2Api32") {
                     device = "Pixel 2"
                     apiLevel = 32             // my minSDK is 31
-                    systemImageSource = "google-atd" // uses an Android Test Device (ATD) system image from Google for API 32.
+                    systemImageSource = "aosp-atd" // uses an Android Test Device (ATD) system image from Google for API 32.
+
+                    require64Bit = false
                 }
             }
         }

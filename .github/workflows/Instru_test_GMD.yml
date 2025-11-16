@@ -2,12 +2,12 @@ name: Android Instrumentation Tests (GMD)
 
 on:
   workflow_dispatch: # manual trigger for now
-#  push:
-#    branches: [ master ]
-#    paths:
-#      - 'app/src/main/**'
-#      - 'app/src/androidTest/**'
-#      - '.github/workflows/instru_test_GMD.yml'
+  push:
+    branches: [ master ]
+    paths:
+      - 'app/src/main/**'
+      - 'app/src/androidTest/**'
+      - '.github/workflows/instru_test_GMD.yml'
 
 jobs:
   instrumentation-tests-gmd:
@@ -33,8 +33,8 @@ jobs:
       - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses > /dev/null || true
 
-      - name: Install GMD system image
-        run: sdkmanager "system-images;android-32;google_atd;x86_64" || true
+#      - name: Install GMD system image
+#        run: sdkmanager "system-images;android-32;aosp_atd;x86_64" || true
 
       - name: Run GMD instrumentation tests
         run: ./gradlew pixel2Api32DebugAndroidTest
