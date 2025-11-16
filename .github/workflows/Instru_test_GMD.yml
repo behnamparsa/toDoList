@@ -2,9 +2,10 @@ name: Android Instrumentation Tests (GMD)
 
 on:
   workflow_dispatch: # manual trigger for now
-  push:
-    branches: [ master ]
+#  push:
+#    branches: [ master ]
 #    paths:
+#      - 'app/src/main/**'
 #      - 'app/src/androidTest/**'
 #      - '.github/workflows/instru_test_GMD.yml'
 

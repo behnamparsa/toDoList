@@ -5,6 +5,7 @@ on:
 #  push:
 #    branches: [ master ]
 #    paths:
+#      - 'app/src/main/**'
 #      - 'app/src/androidTest/**'
 #      - '.github/workflows/instru_test_CommunityAction.yml'
 
