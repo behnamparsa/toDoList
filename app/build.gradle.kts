@@ -44,8 +44,8 @@ android {
             allDevices {
                 create<ManagedVirtualDevice>("pixel2Api32") {
                     device = "Pixel 2"
-                    apiLevel = 32              // ≥ 31 is fine for your minSdk 31
-                    systemImageSource = "google-atd"
+                    apiLevel = 32             // my minSDK is 31
+                    systemImageSource = "google-atd" // uses an Android Test Device (ATD) system image from Google for API 32.
                 }
             }
         }
