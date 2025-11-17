@@ -31,12 +31,20 @@ jobs:
       - name: Build app & androidTest APKs
         run: ./gradlew assembleDebug assembleAndroidTest
 
-      - name: Set up gcloud CLI
+      # Install gcloud CLI (no creds here, just the tool)
+      - name: Install gcloud CLI
         uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ env.PROJECT_ID }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-          export_default_credentials: true
+
+      # Decode Base64 secret and authenticate as the service account
+      - name: Authenticate gcloud with service account
+        run: |
+          echo "${GCP_SA_KEY}" | base64 --decode > "${HOME}/gcloud-sa-key.json"
+          gcloud auth activate-service-account \
+            firebase-test-lab-ci@todolistx-ci.iam.gserviceaccount.com \
+            --key-file="${HOME}/gcloud-sa-key.json"
+          gcloud config set project "${PROJECT_ID}"
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
 
       - name: Run Firebase Test Lab instrumentation tests
         run: |
