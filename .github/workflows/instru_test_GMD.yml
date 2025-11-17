@@ -50,7 +50,7 @@ jobs:
       
 
       - name: Install GMD system image
-        run: sdkmanager "system-images;android-32;aosp-atd;x86_64"
+        run: sdkmanager "system-images;android-32;aosp_atd;x86_64"
 
 
       - name: Run GMD instrumentation tests
