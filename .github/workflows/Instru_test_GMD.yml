@@ -11,7 +11,7 @@ on:
 
 jobs:
   instrumentation-tests-gmd:
-    runs-on: macos-latest  #ubuntu-latest cause problem in CI workflow. GitHub does not do the req. hardware acceleration needed for X86_64 emulator image
+    runs-on: ubuntu-latest  #ubuntu-latest cause problem in CI workflow. GitHub does not do the req. hardware acceleration needed for X86_64 emulator image
     timeout-minutes: 45
 
     steps:
