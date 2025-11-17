@@ -1,0 +1,47 @@
+name: Android Instrumentation Tests (Firebase Test Lab)
+
+on:
+  workflow_dispatch: # manual for now
+  # push:
+  #   branches: [ master ]
+
+jobs:
+  firebase-instrumentation-tests:
+    runs-on: ubuntu-latest
+
+    env:
+      PROJECT_ID: todolistx-ci
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Build app & androidTest APKs
+        run: ./gradlew assembleDebug assembleAndroidTest
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      - name: Run Firebase Test Lab instrumentation tests
+        run: |
+          gcloud firebase test android run \
+            --type=instrumentation \
+            --app=app/build/outputs/apk/debug/app-debug.apk \
+            --test=app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
+            --device model=Pixel2.arm,version=32,locale=en,orientation=portrait
