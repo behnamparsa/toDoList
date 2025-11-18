@@ -14,28 +14,54 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
+    # Shared environment for Android SDK + emulator (used mainly in 2.x steps)
     env:
       ANDROID_HOME: /usr/local/lib/android/sdk
       ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
       ANDROID_AVD_HOME: /home/runner/.android/avd
 
     steps:
+      # ============================================================
+      # 1 - GENERAL CI STEPS
+      #    (Applies to most Android/Gradle builds)
+      #    Diagram: CI Step 1 & CI Step 2
+      # ============================================================
+
       - name: Checkout
         uses: actions/checkout@v4
+        # 1.1 GENERAL
+        # Diagram: CI Step 1 - Checkout project
+        # Pulls source code so Gradle can run (unit tests, instrumentation, etc.)
 
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
+        # 1.2 GENERAL
+        # Diagram: CI Step 2 - Set up JDK + Android SDK
+        # Provides Java runtime required for any Gradle build.
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        # 1.3 GENERAL
+        # Diagram: CI Step 2 - Set up JDK + Android SDK
+        # Installs Android tooling used by both unit tests and instrumentation tests.
+
+      # ============================================================
+      # 2 - EXCLUSIVE TO INSTRUMENTATION TESTING
+      #    2.1 - MANDATORY STEPS
+      #    (Needed to run connectedAndroidTest on a custom emulator)
+      # ============================================================
 
       - name: Install emulator and system image
         run: |
           sdkmanager --install "platform-tools" "emulator" "system-images;android-31;google_apis;x86_64"
           sdkmanager --licenses <<< "y"
+        # 2.1.1 MANDATORY (ENVIRONMENT)
+        # Diagram: CI Step 3 - Choose execution environment
+        # Installs the emulator binary + specific Android system image
+        # so we can later start a virtual device for instrumentation tests.
 
       - name: Create AVD
         run: |
@@ -43,6 +69,10 @@ jobs:
           echo "no" | avdmanager create avd -n test -k "system-images;android-31;google_apis;x86_64" -d pixel
           echo "Available AVDs after creation:"
           "$ANDROID_SDK_ROOT/emulator/emulator" -list-avds
+        # 2.1.2 MANDATORY (ENVIRONMENT)
+        # Diagram: CI Step 3 - Choose execution environment
+        # Defines the emulator profile (AVD = "test") that will be used as the
+        # device under test for instrumentation.
 
       - name: Start emulator
         run: |
@@ -50,7 +80,7 @@ jobs:
           echo "Using emulator binary at: $EMULATOR"
 
           echo "Listing AVDs just before start:"
-          "$EMULATOR" -list-avds
+          "$EMULATOR" -list_avds || "$EMULATOR" -list-avds
 
           # Start emulator in SOFTWARE mode (no hardware acceleration / KVM) v2.0
           nohup "$EMULATOR" \
@@ -84,20 +114,42 @@ jobs:
 
           echo "Emulator booted successfully"
           adb shell input keyevent 82
+        # 2.1.3 MANDATORY (ENVIRONMENT READY)
+        # Diagram: CI Step 3 - Choose execution environment
+        # and prepares for Instrumentation Step 3 - Discover device/emulator
+        # Boots the emulator and waits until Android is fully started so
+        # Gradle can see a ready "device" for instrumentation tests.
 
       - name: Make gradlew executable
         run: chmod +x gradlew
+        # 2.1.4 MANDATORY (BUILD PREP)
+        # Diagram: Instrumentation Step 1 - Run Gradle and set up the build
+        # Ensures Gradle wrapper can run the instrumentation task.
 
       - name: Run instrumentation tests
-        #run: ./gradlew connectedAndroidTest
-        # add a retry once on emulator crash
+        # 2.1.5 MANDATORY (TEST EXECUTION)
+        # Diagram:
+        #   - Instrumentation Step 1: Run Gradle and set up the build
+        #   - Instrumentation Step 2: Build App and androidTest APKs
+        #   - Instrumentation Step 3: Discover device/emulator & install APKs
+        #   - Instrumentation Step 4: Launch instrumentation with test runner
+        #   - Instrumentation Step 5: Collect results and finish the build
+        # Uses a basic retry: if emulator crashes mid-run, we try once more.
         run: |
-          ./gradlew connectedAndroidTest || ./gradlew connectedAndroidTest 
+          ./gradlew connectedAndroidTest || ./gradlew connectedAndroidTest
 
+      # ============================================================
+      # 2.2 - OPTIONAL STEPS (INSTRUMENTATION-SPECIFIC)
+      #      Can be kept for debugging / visibility, or simplified
+      # ============================================================
 
-
-      - name: Run instrumentation tests
+      - name: Run instrumentation tests (extra run - optional)
         run: ./gradlew connectedAndroidTest
+        # 2.2.1 OPTIONAL
+        # Diagram: Same as above (Instrumentation Steps 1–5)
+        # Extra invocation of connectedAndroidTest. This is not strictly
+        # required since the previous step already runs tests with a retry.
+        # Can be removed in a stable pipeline or kept temporarily for diagnosis.
 
       - name: Upload AndroidTest HTML report
         if: always()
@@ -105,3 +157,7 @@ jobs:
         with:
           name: androidTest-html-report
           path: app/build/reports/androidTests/connected/**
+        # 2.2.2 OPTIONAL (REPORTING)
+        # Diagram: Instrumentation Step 5 - Collect results and finish the build
+        # Publishes the instrumentation HTML report as a CI artifact. Recommended
+        # for visibility, but not required for the tests themselves to run.
