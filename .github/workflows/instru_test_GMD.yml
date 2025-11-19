@@ -11,7 +11,7 @@ on:
 
 jobs:
   instrumentation-tests-gmd:
-    runs-on: ubuntu-latest  #ubuntu-latest cause problem in CI workflow. GitHub does not do the req. hardware acceleration needed for X86_64 emulator image
+    runs-on: ubuntu-latest  # using GMD + aosp_atd image, no HW GPU required
     timeout-minutes: 45
 
     steps:
@@ -45,9 +45,7 @@ jobs:
 
       - name: Install SDK components
         run: |
-          sdkmanager "platforms;android-32" "platform-tools" "build-tools;34.0.0" 
-      
-      
+          sdkmanager "platforms;android-32" "platforms;android-36" "platform-tools" "build-tools;34.0.0" "emulator"
 
       - name: Install GMD system image
         run: sdkmanager "system-images;android-32;aosp_atd;x86_64"
