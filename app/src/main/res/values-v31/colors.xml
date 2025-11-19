@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- On Android 12+ use system accent color -->
+    <color name="app_background">@android:color/system_accent2_100</color>
+</resources>
