@@ -7,25 +7,26 @@ import java.io.ObjectOutputStream
 
 class FileHelper {
 
-    private val FILENAME = "listinfo.dat"
+    // You can rename this if you like; it's the file where we store TodoItem list
+    private val FILENAME = "todoitems.dat"
 
-    fun writeData(items: ArrayList<String>, context: Context) {
+    fun writeData(items: ArrayList<TodoItem>, context: Context) {
         val fos: FileOutputStream = context.openFileOutput(FILENAME, Context.MODE_PRIVATE)
         ObjectOutputStream(fos).use { oos ->
             oos.writeObject(items)
         }
     }
 
-    fun readData(context: Context): ArrayList<String> {
+    fun readData(context: Context): ArrayList<TodoItem> {
         return try {
             context.openFileInput(FILENAME).use { fis ->
                 ObjectInputStream(fis).use { ois ->
                     @Suppress("UNCHECKED_CAST")
-                    ois.readObject() as? ArrayList<String> ?: arrayListOf()
+                    ois.readObject() as? ArrayList<TodoItem> ?: arrayListOf()
                 }
             }
         } catch (e: Exception) {
-            // If file doesn't exist or something went wrong: start with an empty list
+            // First launch / no file / corrupted file: start with an empty list
             arrayListOf()
         }
     }

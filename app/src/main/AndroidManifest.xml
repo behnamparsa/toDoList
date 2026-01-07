@@ -12,6 +12,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ToDoList">
 
+
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -21,7 +23,6 @@
             </intent-filter>
         </activity>
 
-
-    </application>
+        </application>
 
 </manifest>
